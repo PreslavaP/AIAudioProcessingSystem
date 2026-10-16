@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AIAudioProcessingSystem/AIAudioProcessingSystem.vcxproj" Id="2a0c063f-2f3b-42b0-ac8d-55243a7c0dc3" />
+</Solution>

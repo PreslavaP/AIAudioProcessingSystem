@@ -1,0 +1,11 @@
+SONGS_COUNT 2
+S01 Bohemian_Rhapsody mp3 354 12.5 Queen Rock
+S02 Shape_of_You mp3 263 9.8 Ed_Sheeran Pop
+
+PODCASTS_COUNT 2
+P01 Cpp_Architecture wav 1800 45.0 TechTalk English
+P02 Clean_Code mp3 1200 30.0 UncleBob English
+
+VOICEMEMOS_COUNT 2
+V01 Project_Idea m4a 45 1.2 2026-10-16 5
+V02 Shopping_List m4a 30 0.8 2026-10-15 3
