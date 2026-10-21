@@ -30,6 +30,20 @@ public:
 	void sortByDuration();
 	void softByTitle();
 
+	//Връща броя на песните в плейлиста
+	size_t getTracksCount() const {
+		return tracks.size();
+	}
+
+	//Връща указател към конкретен трак по индекс (или неговото ID)
+	const AudioTrack* getTrack(size_t index) const {
+		if (index < tracks.size()) {
+			return tracks[index].get();
+		}
+		return nullptr;
+	}
+
+
 	void printPlaylist() const;
 
 	std::string getPlaylistName() const;

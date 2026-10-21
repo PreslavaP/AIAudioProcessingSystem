@@ -1,4 +1,5 @@
 #include "AudioSystemManager.h"
+#include "Exceptions.h"
 #include <iostream>
 #include <memory>
 #include <fstream>
@@ -35,6 +36,7 @@ void AudioSystemManager::showMenu() const {
     std::cout << "3. Playlist management\n";
     std::cout << "4. Save data to file\n";
     std::cout << "5. Load data from file\n";
+    std::cout << "6. Delete data from file\n";
     std::cout << "0. Exit\n";
     std::cout << "----------------------------------------\n";
 }
@@ -55,6 +57,9 @@ void AudioSystemManager::handleChoice(int choice) {
         break;
     case 5:
         loadFromFile("audio_database.txt");
+        break;
+    case 6:
+        handleDeleteMenu();
         break;
     case 0:
         std::cout << "Exiting the program. Goodbye!\n";
@@ -256,23 +261,43 @@ void AudioSystemManager::saveToFile(const std::string& filename) const {
 
     outFile << "VOICEMEMOS_COUNT " << allVoiceMemos.getSize() << "\n";
     for (size_t i = 0; i < allVoiceMemos.getSize(); ++i) {
+        auto d = allVoiceMemos[i].getCreationDate();
         outFile << allVoiceMemos[i].getId() << " "
             << allVoiceMemos[i].getTitle() << " "
             << allVoiceMemos[i].getFormat() << " "
             << allVoiceMemos[i].getDuration() << " "
             << allVoiceMemos[i].getSize() << " "
+            << d.getYear() << "-" << d.getMonth() << "-" << d.getDay() << " "
             << allVoiceMemos[i].getPriority() << "\n";
     }
 
+    outFile << "PLAYLISTS_COUNT " << playlists.getSize() << "\n";
+    for (size_t i = 0; i < playlists.getSize(); ++i) {
+        size_t count = playlists[i].getTracksCount();
+        outFile << playlists[i].getPlaylistName() << " " << count;
+
+        for (size_t j = 0; j < count; ++j) {
+            const AudioTrack* track = playlists[i].getTrack(j);
+            if (track != nullptr) {
+                if (j == 0) {
+                    outFile << " " << track->getId();
+                }
+                else {
+                    outFile << ", " << track->getId();
+                }
+            }
+        }
+        outFile << "\n";
+    }
+
     outFile.close();
-    std::cout << "Data saved successfully to " << filename << "!\n";
+    std::cout << "Data saved successfully! All records and playlists were saved to file: " << filename << "\n";
 }
 
 void AudioSystemManager::loadFromFile(const std::string& filename) {
     std::ifstream inFile(filename);
     if (!inFile.is_open()) {
-        std::cout << "Error: Could not open file for reading: " << filename << "\n";
-        return;
+        throw FileNotFoundException(filename);
     }
 
     allSongs.clear();
@@ -330,8 +355,166 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
             }
             std::cout << "Loaded " << count << " voice memos from file.\n";
         }
+        else if (marker == "PLAYLISTS_COUNT") {
+            inFile >> count;
+            for (size_t i = 0; i < count; ++i) {
+                std::string plName;
+                size_t trackCount;
+                inFile >> plName >> trackCount;
+
+                Playlist pl(plName);
+                for (size_t j = 0; j < trackCount; ++j) {
+                    std::string trackId;
+                    inFile >> trackId;
+
+                    if (!trackId.empty() && trackId.back() == ',') {
+                        trackId.pop_back();
+                    }
+
+                    for (size_t s = 0; s < allSongs.getSize(); ++s) {
+                        if (allSongs[s].getId() == trackId) {
+                            auto songCopy = std::make_unique<SongTrack>(allSongs[s]);
+                            pl.addTrack(std::move(songCopy));
+                            break;
+                        }
+                    }
+                }
+                playlists.push_back(pl);
+            }
+            std::cout << "Loaded " << count << " playlists from file.\n";
+        }
     }
 
     inFile.close();
     std::cout << "Data loaded successfully from " << filename << "!\n";
+}
+
+void AudioSystemManager::handleDeleteMenu() {
+    int deleteChoice = 0;
+    std::cout << "\n--- Delete Menu ---\n";
+    std::cout << "1. Delete Audio Track (Song / Podcast / Voice Memo)\n";
+    std::cout << "2. Delete Playlist\n";
+    std::cout << "Enter your choice: ";
+    std::cin >> deleteChoice;
+
+    if (deleteChoice == 1) {
+        handleDeleteTrack();
+    }
+    else if (deleteChoice == 2) {
+        handleDeletePlaylist();
+    }
+    else {
+        std::cout << "Invalid choice!\n";
+    }
+}
+
+void AudioSystemManager::handleDeleteTrack() {
+    int typeChoice = 0;
+    std::cout << "\n--- Delete Track ---\n";
+    std::cout << "1. Delete Song\n";
+    std::cout << "2. Delete Podcast\n";
+    std::cout << "3. Delete Voice Memo\n";
+    std::cout << "Enter type to delete from: ";
+    std::cin >> typeChoice;
+
+    if (typeChoice == 1) {
+        if (allSongs.isEmpty()) { std::cout << "No songs available.\n"; return; }
+        std::cout << "Select song index to delete:\n";
+        for (size_t i = 0; i < allSongs.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allSongs[i].printInfo();
+        }
+        size_t idx;
+        std::cin >> idx;
+        if (idx >= 1 && idx <= allSongs.getSize()) {
+            allSongs.remove(idx - 1);
+            std::cout << "Song deleted successfully!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else if (typeChoice == 2) {
+        if (allPodcasts.isEmpty()) { std::cout << "No podcasts available.\n"; return; }
+        std::cout << "Select podcast index to delete:\n";
+        for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allPodcasts[i].printInfo();
+        }
+        size_t idx;
+        std::cin >> idx;
+        if (idx >= 1 && idx <= allPodcasts.getSize()) {
+            allPodcasts.remove(idx - 1);
+            std::cout << "Podcast deleted successfully!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else if (typeChoice == 3) {
+        if (allVoiceMemos.isEmpty()) { std::cout << "No voice memos available.\n"; return; }
+        std::cout << "Select voice memo index to delete:\n";
+        for (size_t i = 0; i < allVoiceMemos.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allVoiceMemos[i].printInfo();
+        }
+        size_t idx;
+        std::cin >> idx;
+        if (idx >= 1 && idx <= allVoiceMemos.getSize()) {
+            allVoiceMemos.remove(idx - 1);
+            std::cout << "Voice memo deleted successfully!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else {
+        std::cout << "Invalid choice!\n";
+    }
+}
+
+void AudioSystemManager::handleDeletePlaylist() {
+    if (playlists.isEmpty()) {
+        std::cout << "No playlists available to delete.\n";
+        return;
+    }
+
+    std::cout << "\n--- Delete Playlist ---\n";
+    for (size_t i = 0; i < playlists.getSize(); ++i) {
+        std::cout << i + 1 << ". " << playlists[i].getPlaylistName() << "\n";
+    }
+    std::cout << "Select playlist index to delete: ";
+    size_t plIdx;
+    std::cin >> plIdx;
+
+    if (plIdx < 1 || plIdx > playlists.getSize()) {
+        std::cout << "Invalid playlist index!\n";
+        return;
+    }
+
+    std::cout << "What do you want to do with the tracks inside this playlist?\n";
+    std::cout << "1. Keep them in the system (unassigned)\n";
+    std::cout << "2. Delete them from the system entirely\n";
+    std::cout << "Enter choice: ";
+    int actionChoice;
+    std::cin >> actionChoice;
+
+    if (actionChoice == 2) {
+        Playlist& plToDelete = playlists[plIdx - 1];
+        for (size_t j = 0; j < plToDelete.getTracksCount(); ++j) {
+            const AudioTrack* tr = plToDelete.getTrack(j);
+            if (tr != nullptr) {
+                std::string targetId = tr->getId();
+                for (size_t s = 0; s < allSongs.getSize(); ++s) {
+                    if (allSongs[s].getId() == targetId) {
+                        allSongs.remove(s);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    playlists.remove(plIdx - 1);
+    std::cout << "Playlist deleted successfully!\n";
 }

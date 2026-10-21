@@ -1,11 +1,15 @@
-SONGS_COUNT 2
+SONGS_COUNT 4
 S01 Bohemian_Rhapsody mp3 354 12.5 Queen Rock
 S02 Shape_of_You mp3 263 9.8 Ed_Sheeran Pop
-
+S03 Nothing_Else_Matters mp3 387 11.2 Metallica Metal
+S04 Billie_Jean flac 294 14.5 Michael_Jackson Pop
 PODCASTS_COUNT 2
-P01 Cpp_Architecture wav 1800 45.0 TechTalk English
-P02 Clean_Code mp3 1200 30.0 UncleBob English
-
+P01 Cpp_Architecture wav 1800 45 TechTalk English
+P02 Clean_Code mp3 1200 30 UncleBob English
 VOICEMEMOS_COUNT 2
 V01 Project_Idea m4a 45 1.2 2026-10-16 5
 V02 Shopping_List m4a 30 0.8 2026-10-15 3
+PLAYLISTS_COUNT 3
+My_Favourites 1 S01
+Pop_Hits 2 S02, S04
+Metal_Collection 1 S03

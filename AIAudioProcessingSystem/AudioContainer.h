@@ -146,4 +146,12 @@ public:
         data = new T[capacity];
     }
 
+    void remove(size_t index) {
+        if (index < size) {
+            for (size_t i = index; i < size - 1; ++i) {
+                data[i] = data[i + 1];
+            }
+            size--;
+        }
+    }
 };

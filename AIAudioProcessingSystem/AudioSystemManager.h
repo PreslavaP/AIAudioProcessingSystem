@@ -27,6 +27,9 @@ private:
     void handleAddTrack();
     void handleShowAllTracks() const;
     void handlePlaylistManagement();
+    void handleDeleteMenu();
+    void handleDeleteTrack();
+    void handleDeletePlaylist();
 
     void loadFromFile(const std::string& filename);
     void saveToFile(const std::string& filename) const;
