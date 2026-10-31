@@ -1,15 +1,21 @@
-SONGS_COUNT 4
+SONGS_COUNT 6
 S01 Bohemian_Rhapsody mp3 354 12.5 Queen Rock
-S02 Shape_of_You mp3 263 9.8 Ed_Sheeran Pop
-S03 Nothing_Else_Matters mp3 387 11.2 Metallica Metal
-S04 Billie_Jean flac 294 14.5 Michael_Jackson Pop
-PODCASTS_COUNT 2
+S02 Nothing_Else_Matters mp3 387 11.2 Metallica Metal
+S03 Billie_Jean flac 294 14.5 Michael_Jackson Pop
+S04 Shape_of_Ed mp3 233 8.4 Ed_Sheeran Pop
+S05 Enter_Sandman flac 331 15.6 Metallica Metal
+S06 Blinding_Lights mp3 200 7.5 The_Weekend Synthwave
+PODCASTS_COUNT 5
 P01 Cpp_Architecture wav 1800 45 TechTalk English
 P02 Clean_Code mp3 1200 30 UncleBob English
-VOICEMEMOS_COUNT 2
+P03 Modern_History wav 2400 65 Prof_History Romanian
+P04 Space_Exploration mp3 1500 42 NASA_Audio German
+P05 Science_Today wav 1800 50 LabTalk Bulgarian
+VOICEMEMOS_COUNT 3
 V01 Project_Idea m4a 45 1.2 2026-10-16 5
 V02 Shopping_List m4a 30 0.8 2026-10-15 3
+V03 Ideas_for_App m4a 60 1.5 2026-9-29 2
 PLAYLISTS_COUNT 3
 My_Favourites 1 S01
-Pop_Hits 2 S02, S04
-Metal_Collection 1 S03
+Metal_Collection 2 S03, S05
+Pop_Hits 2 S04, S02

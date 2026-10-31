@@ -30,6 +30,12 @@ private:
     void handleDeleteMenu();
     void handleDeleteTrack();
     void handleDeletePlaylist();
+    void handleConcatenation();
+    void handleFilterTracks() const;
+
+    template <typename T>
+    void reindexContainer(AudioContainer<T>& container, const std::string& prefix);
+    void reIndex();
 
     void loadFromFile(const std::string& filename);
     void saveToFile(const std::string& filename) const;

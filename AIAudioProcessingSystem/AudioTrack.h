@@ -33,6 +33,8 @@ public:
     void setDuration(double duration);
     void setSize(double size);
 
+    AudioTrack* operator+(const AudioTrack& other) const;
+
     virtual void analyze() = 0;
     virtual void printInfo() const = 0;
     virtual AudioTrack* clone() const = 0;

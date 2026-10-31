@@ -1,4 +1,5 @@
 #include "AudioTrack.h"
+#include "SongTrack.h"
 #include <iomanip>
 
 AudioTrack::AudioTrack() : id("UNKNOWN"), title("Untitled"), format("mp3"), duration(0.0), size(0.0) {}
@@ -62,4 +63,13 @@ void AudioTrack::setSize(double size) {
     else {
         this->size = 0.0;
     }
+}
+
+AudioTrack* AudioTrack::operator+(const AudioTrack& other) const {
+    std::string newId = this->id + "_" + other.id;
+    std::string newTitle = this->title + "_" + other.title;
+    double newDuration = this->duration + other.duration;
+    double newSize = this->size + other.size;
+
+    return new SongTrack(newId, newTitle, this->format, newDuration, newSize, "Various", "Mixed");
 }

@@ -37,6 +37,8 @@ void AudioSystemManager::showMenu() const {
     std::cout << "4. Save data to file\n";
     std::cout << "5. Load data from file\n";
     std::cout << "6. Delete data from file\n";
+    std::cout << "7. Concatenate two audio tracks\n";
+    std::cout << "8. Filter tracks by duration or language\n";
     std::cout << "0. Exit\n";
     std::cout << "----------------------------------------\n";
 }
@@ -60,6 +62,12 @@ void AudioSystemManager::handleChoice(int choice) {
         break;
     case 6:
         handleDeleteMenu();
+        break;
+    case 7:
+        handleConcatenation();
+        break;
+    case 8:
+        handleFilterTracks();
         break;
     case 0:
         std::cout << "Exiting the program. Goodbye!\n";
@@ -231,6 +239,8 @@ void AudioSystemManager::handlePlaylistManagement() {
 }
 
 void AudioSystemManager::saveToFile(const std::string& filename) const {
+    const_cast<AudioSystemManager*>(this)->reIndex();
+
     std::ofstream outFile(filename);
     if (!outFile.is_open()) {
         std::cout << "Error: Could not open file for writing: " << filename << "\n";
@@ -517,4 +527,114 @@ void AudioSystemManager::handleDeletePlaylist() {
 
     playlists.remove(plIdx - 1);
     std::cout << "Playlist deleted successfully!\n";
+}
+
+void AudioSystemManager::handleConcatenation() {
+    if (allSongs.getSize() < 2) {
+        std::cout << "You need at least 2 songs in the system to concatenate them.\n";
+        return;
+    }
+
+    std::cout << "\n--- Concatenate Two Songs ---\n";
+    for (size_t i = 0; i < allSongs.getSize(); ++i)
+    {
+        std::cout << i + 1 << ". ";
+        allSongs[i].printInfo();
+    }
+
+    size_t index1, index2;
+    std::cout << "Enter the index of the first song: ";
+    std::cin >> index1;
+    std::cout << "Enter the index of the second song: ";
+    std::cin >> index2;
+
+    if (index1 >= 1 && index1 <= allSongs.getSize() && index2 >= 1 && index2 <= allSongs.getSize()) {
+        AudioTrack* combined = allSongs[index1 - 1] + allSongs[index2 - 1];
+
+        if (combined != nullptr) {
+            SongTrack* castedSong = dynamic_cast<SongTrack*>(combined);
+            if (castedSong != nullptr) {
+                allSongs.push_back(*castedSong);
+                std::cout << "Tracks concatenated successfully! A new combined song was created:\n";
+                castedSong->printInfo();
+            }
+            delete combined;
+        }
+    }
+}
+
+void AudioSystemManager::handleFilterTracks() const {
+    int filterChoice = 0;
+    std::cout << "\n--- Filter Tracks ---\n";
+    std::cout << "1. Filter by maximum duration (seconds)\n";
+    std::cout << "2. Filter podcasts by language\n";
+    std::cout << "\nEnter your choice: ";
+    std::cin >> filterChoice;
+
+    if (filterChoice == 1) {
+        double maxDuration;
+        std::cout << "Enter maximum duration (in sezonds): ";
+        std::cin >> maxDuration;
+
+        std::cout << "\n--- Songs matching duration <= " << maxDuration << "s ---\n";
+        bool songsFound = false;
+        for (size_t i = 0; i < allSongs.getSize(); ++i) {
+            if (allSongs[i].getDuration() <= maxDuration) {
+                allSongs[i].printInfo();
+                songsFound = true;
+            }
+        }
+        if (!songsFound) {
+            std::cout << "No songs found in this duration.\n";
+        }
+       
+
+        std::cout << "\n--- Podcasts matching duration <= " << maxDuration << "s ---\n";
+        bool podcastFound = false;
+        for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
+            if (allPodcasts[i].getDuration() <= maxDuration) {
+                allPodcasts[i].printInfo();
+                podcastFound = true;
+            }
+        }
+        if(!podcastFound) {
+            std::cout << "No podcasts found in this duration.\n";
+        }
+    }
+    else if (filterChoice == 2) {
+        std::string targetLang;
+        std::cout << "Enter language (e.g. English, Bulgarian): ";
+        std::cin >> targetLang;
+
+        std::cout << "\n--- Podcasts in language: " << targetLang << " ---\n";
+        bool found = false;
+        for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
+            if (allPodcasts[i].getPodcastLanguage() == targetLang) {
+                allPodcasts[i].printInfo();
+                found = true;
+            }
+        }
+        if (!found) {
+            std::cout << "No podcasts found for this language.\n";
+        }
+    }
+    else {
+        std::cout << "Invalid choice!\n";
+    }
+}
+
+template <typename T>
+
+void AudioSystemManager::reindexContainer(AudioContainer<T>& container, const std::string& prefix) {
+    for (size_t i = 0; i < container.getSize(); ++i) {
+        std::string numStr = (i + 1 < 10) ? "0" + std::to_string(i + 1) : std::to_string(i + 1);
+        std::string newId = prefix + numStr;
+        container[i].setId(newId);
+    }
+}
+
+void AudioSystemManager::reIndex() {
+    reindexContainer(allSongs, "S");
+    reindexContainer(allPodcasts, "P");
+    reindexContainer(allVoiceMemos, "V");
 }
