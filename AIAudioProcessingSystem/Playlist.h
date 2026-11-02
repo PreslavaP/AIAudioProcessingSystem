@@ -28,7 +28,7 @@ public:
 
 	//Сортиране на тракове
 	void sortByDuration();
-	void softByTitle();
+	void sortByTitle();
 
 	//Връща броя на песните в плейлиста
 	size_t getTracksCount() const {

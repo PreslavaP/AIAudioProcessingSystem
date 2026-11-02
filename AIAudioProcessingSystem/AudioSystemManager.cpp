@@ -692,7 +692,7 @@ void AudioSystemManager::handleFilterTracks() const {
 
     if (filterChoice == 1) {
         double maxDuration;
-        std::cout << "Enter maximum duration (in sezonds): ";
+        std::cout << "Enter maximum duration (in seconds): ";
         std::cin >> maxDuration;
 
         std::cout << "\n--- Songs matching duration <= " << maxDuration << "s ---\n";

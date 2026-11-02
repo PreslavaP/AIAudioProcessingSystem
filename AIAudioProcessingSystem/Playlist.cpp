@@ -52,7 +52,7 @@ void Playlist::sortByDuration() {
 	});
 }
 
-void Playlist::softByTitle() {
+void Playlist::sortByTitle() {
 	std::sort(tracks.begin(), tracks.end(), [](const auto& a, const auto& b) {
 		return a->getTitle() < b->getTitle();
 		});
