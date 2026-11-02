@@ -32,6 +32,8 @@ private:
     void handleDeletePlaylist();
     void handleConcatenation();
     void handleFilterTracks() const;
+    void handleAddSegments();
+    void handleTextSearch() const;
 
     template <typename T>
     void reindexContainer(AudioContainer<T>& container, const std::string& prefix);

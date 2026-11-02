@@ -19,6 +19,7 @@ void AudioSystemManager::run() {
             std::cin.clear();
             std::cin.ignore(10000, '\n');
             std::cout << "Invalid input! Please enter a valid menu number.\n";
+            choice = -1;
             continue;
         }
 
@@ -39,6 +40,8 @@ void AudioSystemManager::showMenu() const {
     std::cout << "6. Delete data from file\n";
     std::cout << "7. Concatenate two audio tracks\n";
     std::cout << "8. Filter tracks by duration or language\n";
+    std::cout << "9.Add subtitle/segment to a track\n";
+    std::cout << "10. Search text (in Song/Podcast/Memo)\n";
     std::cout << "0. Exit\n";
     std::cout << "----------------------------------------\n";
 }
@@ -68,6 +71,12 @@ void AudioSystemManager::handleChoice(int choice) {
         break;
     case 8:
         handleFilterTracks();
+        break;
+    case 9:
+        handleAddSegments();
+        break;
+    case 10:
+        handleTextSearch();
         break;
     case 0:
         std::cout << "Exiting the program. Goodbye!\n";
@@ -256,6 +265,16 @@ void AudioSystemManager::saveToFile(const std::string& filename) const {
             << allSongs[i].getSize() << " "
             << allSongs[i].getPerformer() << " "
             << allSongs[i].getGenre() << "\n";
+
+        size_t segCount = allSongs[i].segments.getSize();
+        outFile << segCount << "\n";
+        for (size_t s = 0; s < segCount; ++s) {
+            auto start = allSongs[i].segments[s].getStartTime();
+            auto end = allSongs[i].segments[s].getEndTime();
+            outFile << start.getHours() << " " << start.getMinutes() << " " << start.getSeconds() << " " << start.getMilliseconds() << " "
+                << end.getHours() << " " << end.getMinutes() << " " << end.getSeconds() << " " << end.getMilliseconds() << "\n";
+            outFile << allSongs[i].segments[s].getText() << "\n";
+        }
     }
 
     outFile << "PODCASTS_COUNT " << allPodcasts.getSize() << "\n";
@@ -267,6 +286,16 @@ void AudioSystemManager::saveToFile(const std::string& filename) const {
             << allPodcasts[i].getSize() << " "
             << allPodcasts[i].getPodcastHost() << " "
             << allPodcasts[i].getPodcastLanguage() << "\n";
+
+        size_t segCount = allPodcasts[i].segments.getSize();
+        outFile << segCount << "\n";
+        for (size_t s = 0; s < segCount; ++s) {
+            auto start = allPodcasts[i].segments[s].getStartTime();
+            auto end = allPodcasts[i].segments[s].getEndTime();
+            outFile << start.getHours() << " " << start.getMinutes() << " " << start.getSeconds() << " " << start.getMilliseconds() << " "
+                << end.getHours() << " " << end.getMinutes() << " " << end.getSeconds() << " " << end.getMilliseconds() << "\n";
+            outFile << allPodcasts[i].segments[s].getText() << "\n";
+        }
     }
 
     outFile << "VOICEMEMOS_COUNT " << allVoiceMemos.getSize() << "\n";
@@ -279,6 +308,16 @@ void AudioSystemManager::saveToFile(const std::string& filename) const {
             << allVoiceMemos[i].getSize() << " "
             << d.getYear() << "-" << d.getMonth() << "-" << d.getDay() << " "
             << allVoiceMemos[i].getPriority() << "\n";
+
+        size_t segCount = allVoiceMemos[i].segments.getSize();
+        outFile << segCount << "\n";
+        for (size_t s = 0; s < segCount; ++s) {
+            auto start = allVoiceMemos[i].segments[s].getStartTime();
+            auto end = allVoiceMemos[i].segments[s].getEndTime();
+            outFile << start.getHours() << " " << start.getMinutes() << " " << start.getSeconds() << " " << start.getMilliseconds() << " "
+                << end.getHours() << " " << end.getMinutes() << " " << end.getSeconds() << " " << end.getMilliseconds() << "\n";
+            outFile << allVoiceMemos[i].segments[s].getText() << "\n";
+        }
     }
 
     outFile << "PLAYLISTS_COUNT " << playlists.getSize() << "\n";
@@ -313,6 +352,7 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
     allSongs.clear();
     allPodcasts.clear();
     allVoiceMemos.clear();
+    playlists.clear();
 
     std::string marker;
     size_t count = 0;
@@ -327,6 +367,24 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
 
                 inFile >> id >> title >> format >> duration >> size >> performer >> genre;
                 SongTrack song(id, title, format, duration, size, performer, genre);
+
+                if (inFile >> std::ws && isdigit(inFile.peek())) {
+                    size_t segCount = 0;
+                    inFile >> segCount;
+                    for (size_t s = 0; s < segCount; ++s) {
+                        int sh, sm, ss, sms, eh, em, es, ems;
+                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        std::string segText;
+                        inFile.ignore();
+                        std::getline(inFile, segText);
+
+                        Timestamp start(sh, sm, ss, sms);
+                        Timestamp end(eh, em, es, ems);
+                        AudioSegment segment(start, end, segText);
+                        song.addSegment(segment);
+                    }
+                }
+
                 allSongs.push_back(song);
             }
             std::cout << "Loaded " << count << " songs from file.\n";
@@ -340,6 +398,24 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
 
                 inFile >> id >> title >> format >> duration >> size >> host >> language;
                 PodcastTrack podcast(id, title, format, duration, size, host, language);
+
+                if (inFile >> std::ws && isdigit(inFile.peek())) {
+                    size_t segCount = 0;
+                    inFile >> segCount;
+                    for (size_t s = 0; s < segCount; ++s) {
+                        int sh, sm, ss, sms, eh, em, es, ems;
+                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        std::string segText;
+                        inFile.ignore();
+                        std::getline(inFile, segText);
+
+                        Timestamp start(sh, sm, ss, sms);
+                        Timestamp end(eh, em, es, ems);
+                        AudioSegment segment(start, end, segText);
+                        podcast.addSegment(segment);
+                    }
+                }
+
                 allPodcasts.push_back(podcast);
             }
             std::cout << "Loaded " << count << " podcasts from file.\n";
@@ -361,6 +437,24 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
 
                 Date date(year, month, day);
                 VoiceMemoTrack memo(id, title, format, duration, size, date, priority);
+
+                if (inFile >> std::ws && isdigit(inFile.peek())) {
+                    size_t segCount = 0;
+                    inFile >> segCount;
+                    for (size_t s = 0; s < segCount; ++s) {
+                        int sh, sm, ss, sms, eh, em, es, ems;
+                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        std::string segText;
+                        inFile.ignore();
+                        std::getline(inFile, segText);
+
+                        Timestamp start(sh, sm, ss, sms);
+                        Timestamp end(eh, em, es, ems);
+                        AudioSegment segment(start, end, segText);
+                        memo.addSegment(segment);
+                    }
+                }
+
                 allVoiceMemos.push_back(memo);
             }
             std::cout << "Loaded " << count << " voice memos from file.\n";
@@ -381,11 +475,36 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                         trackId.pop_back();
                     }
 
+                    bool foundAndAdded = false;
+
                     for (size_t s = 0; s < allSongs.getSize(); ++s) {
                         if (allSongs[s].getId() == trackId) {
                             auto songCopy = std::make_unique<SongTrack>(allSongs[s]);
                             pl.addTrack(std::move(songCopy));
+                            foundAndAdded = true;
                             break;
+                        }
+                    }
+
+                    if (!foundAndAdded) {
+                        for (size_t p = 0; p < allPodcasts.getSize(); ++p) {
+                            if (allPodcasts[p].getId() == trackId) {
+                                auto podcastCopy = std::make_unique<PodcastTrack>(allPodcasts[p]);
+                                pl.addTrack(std::move(podcastCopy));
+                                foundAndAdded = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!foundAndAdded) {
+                        for (size_t m = 0; m < allVoiceMemos.getSize(); ++m) {
+                            if (allVoiceMemos[m].getId() == trackId) {
+                                auto memoCopy = std::make_unique<VoiceMemoTrack>(allVoiceMemos[m]);
+                                pl.addTrack(std::move(memoCopy));
+                                foundAndAdded = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -606,10 +725,22 @@ void AudioSystemManager::handleFilterTracks() const {
         std::cout << "Enter language (e.g. English, Bulgarian): ";
         std::cin >> targetLang;
 
+        std::string lowerTargetLang = targetLang;
+        for (char& c : lowerTargetLang) {
+            c = std::tolower(static_cast<unsigned char>(c));
+        }
+
         std::cout << "\n--- Podcasts in language: " << targetLang << " ---\n";
         bool found = false;
         for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
-            if (allPodcasts[i].getPodcastLanguage() == targetLang) {
+            std::string podcastLang = allPodcasts[i].getPodcastLanguage();
+
+            std::string lowerPodcastLang = podcastLang;
+            for (char& c : lowerPodcastLang) {
+                c = std::tolower(static_cast<unsigned char>(c));
+            }
+
+            if (lowerPodcastLang == lowerTargetLang) {
                 allPodcasts[i].printInfo();
                 found = true;
             }
@@ -620,6 +751,209 @@ void AudioSystemManager::handleFilterTracks() const {
     }
     else {
         std::cout << "Invalid choice!\n";
+    }
+}
+
+void AudioSystemManager::handleAddSegments() {
+    int typeChoice = 0;
+    std::cout << "\n--- Add Subtitle/Segment ---\n";
+    std::cout << "1. Add to a Song\n";
+    std::cout << "2. Add to a Podcast\n";
+    std::cout << "3. Add to a Voice Memo\n";
+    std::cout << "Enter type: ";
+    std::cin >> typeChoice;
+
+    if (typeChoice == 1 && !allSongs.isEmpty()) {
+        for (size_t i = 0; i < allSongs.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allSongs[i].printInfo();
+        }
+        size_t index;
+        std::cout << "Select song index: ";
+        std::cin >> index;
+        if (index >= 1 && index <= allSongs.getSize()) {
+            int startHours, startMinutes, startSeconds, startMilliseconds;
+            int endHours, endMinutes, endSeconds, endMilliseconds;
+            std::string subtitleText;
+
+            std::cout << "Enter Start Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> startHours >> startMinutes >> startSeconds >> startMilliseconds;
+
+            std::cout << "Enter End Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> endHours >> endMinutes >> endSeconds >> endMilliseconds;
+
+            std::cout << "Enter Subtitle Text: ";
+            std::cin.ignore();
+            std::getline(std::cin, subtitleText);
+
+            Timestamp startTime(startHours, startMinutes, startSeconds, startMilliseconds);
+            Timestamp endTime(endHours, endMinutes, endSeconds, endMilliseconds);
+            AudioSegment segment(startTime, endTime, subtitleText);
+
+            allSongs[index - 1].addSegment(segment);
+            std::cout << "Segment added successfully to song!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else if (typeChoice == 2 && !allPodcasts.isEmpty()) {
+        for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allPodcasts[i].printInfo();
+        }
+        size_t index;
+        std::cout << "Select podcast index: ";
+        std::cin >> index;
+        if (index >= 1 && index <= allPodcasts.getSize()) {
+            int startHours, startMinutes, startSeconds, startMilliseconds;
+            int endHours, endMinutes, endSeconds, endMilliseconds;
+            std::string subtitleText;
+
+            std::cout << "Enter Start Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> startHours >> startMinutes >> startSeconds >> startMilliseconds;
+
+            std::cout << "Enter End Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> endHours >> endMinutes >> endSeconds >> endMilliseconds;
+
+            std::cout << "Enter Subtitle Text: ";
+            std::cin.ignore();
+            std::getline(std::cin, subtitleText);
+
+            Timestamp startTime(startHours, startMinutes, startSeconds, startMilliseconds);
+            Timestamp endTime(endHours, endMinutes, endSeconds, endMilliseconds);
+            AudioSegment segment(startTime, endTime, subtitleText);
+
+            allPodcasts[index - 1].addSegment(segment);
+            std::cout << "Segment added successfully to podcast!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else if (typeChoice == 3 && !allVoiceMemos.isEmpty()) {
+        for (size_t i = 0; i < allVoiceMemos.getSize(); ++i) {
+            std::cout << i + 1 << ". ";
+            allVoiceMemos[i].printInfo();
+        }
+        size_t index;
+        std::cout << "Select voice memo index: ";
+        std::cin >> index;
+        if (index >= 1 && index <= allVoiceMemos.getSize()) {
+            int startHours, startMinutes, startSeconds, startMilliseconds;
+            int endHours, endMinutes, endSeconds, endMilliseconds;
+            std::string subtitleText;
+
+            std::cout << "Enter Start Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> startHours >> startMinutes >> startSeconds >> startMilliseconds;
+
+            std::cout << "Enter End Time (Hours Minutes Seconds Milliseconds): ";
+            std::cin >> endHours >> endMinutes >> endSeconds >> endMilliseconds;
+
+            std::cout << "Enter Subtitle Text: ";
+            std::cin.ignore();
+            std::getline(std::cin, subtitleText);
+
+            Timestamp startTime(startHours, startMinutes, startSeconds, startMilliseconds);
+            Timestamp endTime(endHours, endMinutes, endSeconds, endMilliseconds);
+            AudioSegment segment(startTime, endTime, subtitleText);
+
+            allVoiceMemos[index - 1].addSegment(segment);
+            std::cout << "Segment added successfully to voice memo!\n";
+        }
+        else {
+            std::cout << "Invalid index!\n";
+        }
+    }
+    else {
+        std::cout << "Invalid choice or no tracks available in this category.\n";
+    }
+}
+
+void AudioSystemManager::handleTextSearch() const {
+    int searchChoice = 0;
+    std::cout << "\n--- Text & Subtitle Search Menu ---\n";
+    std::cout << "1. Search in Songs Subtitles\n";
+    std::cout << "2. Search in Podcasts Subtitles\n";
+    std::cout << "3. Search in Voice Memos Subtitles\n";
+    std::cout << "4. Search across ALL records Subtitles\n";
+    std::cout << "Enter your choice: ";
+    std::cin >> searchChoice;
+
+    if (searchChoice < 1 || searchChoice > 4) {
+        std::cout << "Invalid choice!\n";
+        return;
+    }
+
+    std::string keyword;
+    std::cout << "Enter keyword or phrase to search for in subtitles: ";
+    std::cin.ignore();
+    std::getline(std::cin, keyword);
+
+    if (keyword.empty()) {
+        std::cout << "Search keyword cannot be empty!\n";
+        return;
+    }
+
+    std::cout << "\nSearching subtitles for: \"" << keyword << "\"...\n";
+    bool foundAny = false;
+
+    // --- 1. Търсене в субтитрите на песните ---
+    if (searchChoice == 1 || searchChoice == 4) {
+        for (size_t i = 0; i < allSongs.getSize(); ++i) {
+            bool matched = false;
+            for (size_t s = 0; s < allSongs[i].segments.getSize(); ++s) {
+                if (allSongs[i].segments[s].getText().find(keyword) != std::string::npos) {
+                    matched = true;
+                    std::cout << "  -> Found in segment: " << allSongs[i].segments[s] << "\n";
+                }
+            }
+            if (matched) {
+                std::cout << "[Song Match]: ";
+                allSongs[i].printInfo();
+                foundAny = true;
+            }
+        }
+    }
+
+    // --- 2. Търсене в субтитрите на подкастите ---
+    if (searchChoice == 2 || searchChoice == 4) {
+        for (size_t i = 0; i < allPodcasts.getSize(); ++i) {
+            bool matched = false;
+            for (size_t s = 0; s < allPodcasts[i].segments.getSize(); ++s) {
+                if (allPodcasts[i].segments[s].getText().find(keyword) != std::string::npos) {
+                    matched = true;
+                    std::cout << "  -> Found in segment: " << allPodcasts[i].segments[s] << "\n";
+                }
+            }
+            if (matched) {
+                std::cout << "[Podcast Match]: ";
+                allPodcasts[i].printInfo();
+                foundAny = true;
+            }
+        }
+    }
+
+    // --- 3. Търсене в субтитрите на гласовите бележки ---
+    if (searchChoice == 3 || searchChoice == 4) {
+        for (size_t i = 0; i < allVoiceMemos.getSize(); ++i) {
+            bool matched = false;
+            for (size_t s = 0; s < allVoiceMemos[i].segments.getSize(); ++s) {
+                if (allVoiceMemos[i].segments[s].getText().find(keyword) != std::string::npos) {
+                    matched = true;
+                    std::cout << "  -> Found in segment: " << allVoiceMemos[i].segments[s] << "\n";
+                }
+            }
+            if (matched) {
+                std::cout << "[Voice Memo Match]: ";
+                allVoiceMemos[i].printInfo();
+                foundAny = true;
+            }
+        }
+    }
+
+    if (!foundAny) {
+        std::cout << "No matching subtitles found for keyword: \"" << keyword << "\".\n";
     }
 }
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <ostream>
+#include "AudioContainer.h"
+#include "AudioSegment.h"
 
 class AudioTrack {
 protected:
@@ -34,6 +36,9 @@ public:
     void setSize(double size);
 
     AudioTrack* operator+(const AudioTrack& other) const;
+
+    AudioContainer<AudioSegment> segments;
+    void addSegment(const AudioSegment& segment);
 
     virtual void analyze() = 0;
     virtual void printInfo() const = 0;

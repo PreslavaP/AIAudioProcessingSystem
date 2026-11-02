@@ -65,6 +65,10 @@ void AudioTrack::setSize(double size) {
     }
 }
 
+void AudioTrack::addSegment(const AudioSegment& segment) {
+    segments.push_back(segment);
+}
+
 AudioTrack* AudioTrack::operator+(const AudioTrack& other) const {
     std::string newId = this->id + "_" + other.id;
     std::string newTitle = this->title + "_" + other.title;
