@@ -3,20 +3,38 @@
 #include <exception>
 #include <string>
 
-class AudioSystemException : public std::exception {
+class AudioSystemException : public std::exception
+{
 protected:
-	std::string message;
+    std::string message;
 
-public: 
-    AudioSystemException(const std::string& msg) : message(msg) {}
-    const char* what() const noexcept override {
+public:
+    AudioSystemException(const std::string& msg)
+        : message(msg)
+    {
+    }
+
+    const char* what() const noexcept override
+    {
         return message.c_str();
     }
 };
 
-class FileNotFoundException : public AudioSystemException {
+class FileNotFoundException : public AudioSystemException
+{
 public:
     FileNotFoundException(const std::string& filename)
-        : AudioSystemException("Error: Could not open file: " + filename) {
+        : AudioSystemException("Error: Could not open file: " + filename)
+    {
+    }
+};
+
+class InvalidFileFormatException : public AudioSystemException
+{
+public:
+    InvalidFileFormatException(const std::string& filename)
+        : AudioSystemException(
+            "Error: Invalid file format: " + filename)
+    {
     }
 };

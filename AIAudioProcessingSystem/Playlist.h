@@ -14,6 +14,7 @@ private:
 public:
 	Playlist();
 	Playlist(std::string name);
+	Playlist(const Playlist& other);
 
 	Playlist& operator=(const Playlist& other);
 

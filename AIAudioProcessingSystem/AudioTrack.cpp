@@ -69,11 +69,20 @@ void AudioTrack::addSegment(const AudioSegment& segment) {
     segments.push_back(segment);
 }
 
-AudioTrack* AudioTrack::operator+(const AudioTrack& other) const {
+std::unique_ptr<AudioTrack> AudioTrack::operator+(const AudioTrack& other) const
+{
     std::string newId = this->id + "_" + other.id;
     std::string newTitle = this->title + "_" + other.title;
     double newDuration = this->duration + other.duration;
     double newSize = this->size + other.size;
 
-    return new SongTrack(newId, newTitle, this->format, newDuration, newSize, "Various", "Mixed");
+    return std::make_unique<SongTrack>(
+        newId,
+        newTitle,
+        this->format,
+        newDuration,
+        newSize,
+        "Various",
+        "Mixed"
+    );
 }

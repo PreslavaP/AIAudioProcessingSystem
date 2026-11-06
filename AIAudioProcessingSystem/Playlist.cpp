@@ -7,6 +7,18 @@ Playlist::Playlist(std::string name) {
 	setPlaylistName(name);
 }
 
+Playlist::Playlist(const Playlist& other)
+	: playlistName(other.playlistName)
+{
+	for (const auto& track : other.tracks)
+	{
+		if (track)
+		{
+			tracks.push_back(std::unique_ptr<AudioTrack>(track->clone()));
+		}
+	}
+}
+
 Playlist& Playlist::operator=(const Playlist& other) {
 	if (this == &other) {
 		return *this;

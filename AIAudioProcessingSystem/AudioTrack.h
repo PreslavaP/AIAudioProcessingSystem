@@ -35,7 +35,7 @@ public:
     void setDuration(double duration);
     void setSize(double size);
 
-    AudioTrack* operator+(const AudioTrack& other) const;
+    std::unique_ptr<AudioTrack> operator+(const AudioTrack& other) const;
 
     AudioContainer<AudioSegment> segments;
     void addSegment(const AudioSegment& segment);

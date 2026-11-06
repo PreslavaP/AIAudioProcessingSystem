@@ -4,6 +4,7 @@
 #include <memory>
 #include <fstream>
 #include <sstream>
+#include <limits>
 
 AudioSystemManager::AudioSystemManager() {}
 
@@ -359,13 +360,20 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
 
     while (inFile >> marker) {
         if (marker == "SONGS_COUNT") {
-            inFile >> count;
+            if (!(inFile >> count))
+            {
+                throw InvalidFileFormatException(filename);
+            }
             for (size_t i = 0; i < count; ++i) {
                 std::string id, title, format, performer, genre;
                 double duration = 0.0;
                 double size = 0.0;
 
-                inFile >> id >> title >> format >> duration >> size >> performer >> genre;
+                if (!(inFile >> id >> title >> format >> duration
+                    >> size >> performer >> genre))
+                {
+                    throw InvalidFileFormatException(filename);
+                }
                 SongTrack song(id, title, format, duration, size, performer, genre);
 
                 if (inFile >> std::ws && isdigit(inFile.peek())) {
@@ -373,10 +381,20 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                     inFile >> segCount;
                     for (size_t s = 0; s < segCount; ++s) {
                         int sh, sm, ss, sms, eh, em, es, ems;
-                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        if (!(inFile >> sh >> sm >> ss >> sms
+                            >> eh >> em >> es >> ems))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
                         std::string segText;
-                        inFile.ignore();
-                        std::getline(inFile, segText);
+                        inFile.ignore(
+                            std::numeric_limits<std::streamsize>::max(), '\n'
+                        );
+
+                        if (!std::getline(inFile, segText))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
 
                         Timestamp start(sh, sm, ss, sms);
                         Timestamp end(eh, em, es, ems);
@@ -390,13 +408,20 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
             std::cout << "Loaded " << count << " songs from file.\n";
         }
         else if (marker == "PODCASTS_COUNT") {
-            inFile >> count;
+            if (!(inFile >> count))
+            {
+                throw InvalidFileFormatException(filename);
+            }
             for (size_t i = 0; i < count; ++i) {
                 std::string id, title, format, host, language;
                 double duration = 0.0;
                 double size = 0.0;
 
-                inFile >> id >> title >> format >> duration >> size >> host >> language;
+                if (!(inFile >> id >> title >> format >> duration
+                    >> size >> host >> language))
+                {
+                    throw InvalidFileFormatException(filename);
+                }
                 PodcastTrack podcast(id, title, format, duration, size, host, language);
 
                 if (inFile >> std::ws && isdigit(inFile.peek())) {
@@ -404,10 +429,20 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                     inFile >> segCount;
                     for (size_t s = 0; s < segCount; ++s) {
                         int sh, sm, ss, sms, eh, em, es, ems;
-                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        if (!(inFile >> sh >> sm >> ss >> sms
+                            >> eh >> em >> es >> ems))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
                         std::string segText;
-                        inFile.ignore();
-                        std::getline(inFile, segText);
+                        inFile.ignore(
+                            std::numeric_limits<std::streamsize>::max(), '\n'
+                        );
+
+                        if (!std::getline(inFile, segText))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
 
                         Timestamp start(sh, sm, ss, sms);
                         Timestamp end(eh, em, es, ems);
@@ -421,19 +456,32 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
             std::cout << "Loaded " << count << " podcasts from file.\n";
         }
         else if (marker == "VOICEMEMOS_COUNT") {
-            inFile >> count;
+            if (!(inFile >> count))
+            {
+                throw InvalidFileFormatException(filename);
+            }
             for (size_t i = 0; i < count; ++i) {
                 std::string id, title, format, dateStr;
                 double duration = 0.0;
                 double size = 0.0;
                 int priority = 1;
 
-                inFile >> id >> title >> format >> duration >> size >> dateStr >> priority;
+                if (!(inFile >> id >> title >> format >> duration
+                    >> size >> dateStr >> priority))
+                {
+                    throw InvalidFileFormatException(filename);
+                }
 
-                int year = 2026, month = 1, day = 1;
+                int year, month, day;
                 char dash1, dash2;
+
                 std::stringstream ss(dateStr);
-                ss >> year >> dash1 >> month >> dash2 >> day;
+
+                if (!(ss >> year >> dash1 >> month >> dash2 >> day)
+                    || dash1 != '-' || dash2 != '-')
+                {
+                    throw InvalidFileFormatException(filename);
+                }
 
                 Date date(year, month, day);
                 VoiceMemoTrack memo(id, title, format, duration, size, date, priority);
@@ -443,10 +491,20 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                     inFile >> segCount;
                     for (size_t s = 0; s < segCount; ++s) {
                         int sh, sm, ss, sms, eh, em, es, ems;
-                        inFile >> sh >> sm >> ss >> sms >> eh >> em >> es >> ems;
+                        if (!(inFile >> sh >> sm >> ss >> sms
+                            >> eh >> em >> es >> ems))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
                         std::string segText;
-                        inFile.ignore();
-                        std::getline(inFile, segText);
+                        inFile.ignore(
+                            std::numeric_limits<std::streamsize>::max(), '\n'
+                        );
+
+                        if (!std::getline(inFile, segText))
+                        {
+                            throw InvalidFileFormatException(filename);
+                        }
 
                         Timestamp start(sh, sm, ss, sms);
                         Timestamp end(eh, em, es, ems);
@@ -460,7 +518,10 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
             std::cout << "Loaded " << count << " voice memos from file.\n";
         }
         else if (marker == "PLAYLISTS_COUNT") {
-            inFile >> count;
+            if (!(inFile >> count))
+            {
+                throw InvalidFileFormatException(filename);
+            }
             for (size_t i = 0; i < count; ++i) {
                 std::string plName;
                 size_t trackCount;
@@ -511,6 +572,10 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                 playlists.push_back(pl);
             }
             std::cout << "Loaded " << count << " playlists from file.\n";
+        }
+        else
+        {
+            throw InvalidFileFormatException(filename);
         }
     }
 
@@ -668,16 +733,23 @@ void AudioSystemManager::handleConcatenation() {
     std::cin >> index2;
 
     if (index1 >= 1 && index1 <= allSongs.getSize() && index2 >= 1 && index2 <= allSongs.getSize()) {
-        AudioTrack* combined = allSongs[index1 - 1] + allSongs[index2 - 1];
+        std::unique_ptr<AudioTrack> combined =
+            allSongs[index1 - 1] + allSongs[index2 - 1];
 
-        if (combined != nullptr) {
-            SongTrack* castedSong = dynamic_cast<SongTrack*>(combined);
-            if (castedSong != nullptr) {
+        if (combined != nullptr)
+        {
+            SongTrack* castedSong =
+                dynamic_cast<SongTrack*>(combined.get());
+
+            if (castedSong != nullptr)
+            {
                 allSongs.push_back(*castedSong);
-                std::cout << "Tracks concatenated successfully! A new combined song was created:\n";
+
+                std::cout << "Tracks concatenated successfully! "
+                    << "A new combined song was created.\n";
+
                 castedSong->printInfo();
             }
-            delete combined;
         }
     }
 }
