@@ -140,7 +140,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AIAudioProcessingSystem.cpp" />
+    <ClCompile Include="AudioProcessingAndAnalysisSystem.cpp" />
     <ClCompile Include="AudioSegment.cpp" />
     <ClCompile Include="AudioSystemManager.cpp" />
     <ClCompile Include="AudioTrack.cpp" />

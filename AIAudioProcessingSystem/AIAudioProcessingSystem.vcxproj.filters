@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AIAudioProcessingSystem.cpp">
+    <ClCompile Include="AudioProcessingAndAnalysisSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Timestamp.cpp">
