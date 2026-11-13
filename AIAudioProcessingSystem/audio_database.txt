@@ -1,6 +1,8 @@
 SONGS_COUNT 7
 S01 Bohemian_Rhapsody mp3 354 12.5 Queen Rock
-0
+1
+0 0 55 0 0 1 45 0
+Mama, just killed a man. Put a gun against his head, pulled my trigger, now he's dead. Mama, life had just begun. But now I've gone and thrown it all away. Mama, ooh, didn't mean to make you cry If I'm not back again this time tomorrow. Carry on, carry on as if nothing really matters.
 S02 Nothing_Else_Matters mp3 387 11.2 Metallica Metal
 1
 0 0 5 0 0 0 12 500

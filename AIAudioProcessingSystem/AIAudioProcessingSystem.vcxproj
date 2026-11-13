@@ -149,7 +149,7 @@
     <ClCompile Include="PodcastTrack.cpp" />
     <ClCompile Include="SongTrack.cpp" />
     <ClCompile Include="Timestamp.cpp" />
-    <ClCompile Include="VoiceMemotrack.cpp" />
+    <ClCompile Include="VoiceMemoTrack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioContainer.h" />
