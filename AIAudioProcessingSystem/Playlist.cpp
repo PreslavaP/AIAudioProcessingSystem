@@ -92,6 +92,17 @@ void Playlist::setPlaylistName(std::string name) {
 	}
 }
 
+void Playlist::removeTrackById(const std::string& id) {
+	for (size_t i = 0; i < tracks.size(); ) {
+		if (tracks[i] != nullptr && tracks[i]->getId() == id) {
+			tracks.erase(tracks.begin() + i);
+		}
+		else {
+			++i;
+		}
+	}
+}
+
 std::ostream& operator<<(std::ostream& os, const Playlist& playlist) {
 	os << "Playlist Name: " << playlist.playlistName << ", Tracks Count: " << playlist.tracks.size()
 		<< ", Total Duration: " << playlist.getTotalDuration() << "s";

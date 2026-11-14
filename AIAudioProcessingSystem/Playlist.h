@@ -50,5 +50,7 @@ public:
 	std::string getPlaylistName() const;
 	void setPlaylistName(std::string name);
 
+	void removeTrackById(const std::string& id);
+
 	friend std::ostream& operator<<(std::ostream& os, const Playlist& playlist);
 };

@@ -87,6 +87,7 @@ int safeReadInt(const std::string& prompt) {
     while (true) {
         std::cout << prompt;
         if (std::cin >> value) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             return value;
         }
         std::cout << "Invalid input! Please enter a valid integer: ";
@@ -141,67 +142,64 @@ void AudioSystemManager::handleChoice(int choice) {
 }
 
 void AudioSystemManager::handleAddTrack() {
-    int typeChoice = 0;
     std::cout << "\n--- Select Track Type ---\n";
     std::cout << "1. Song Track\n";
     std::cout << "2. Podcast Track\n";
     std::cout << "3. Voice Memo Track\n";
-    typeChoice = safeReadInt("Enter type: ");
+    int typeChoice = safeReadInt("Enter type: ");
+
+    if (typeChoice < 1 || typeChoice > 3) {
+        std::cout << "Invalid track type selected!\n";
+        return;
+    }
 
     std::string id, title, format;
-    double duration = 0.0;
-    double size = 0.0;
-
     std::cout << "Enter ID: ";
-    std::cin >> id;
+    std::getline(std::cin >> std::ws, id);
+
     std::cout << "Enter Title: ";
-    std::cin.ignore();
-    std::getline(std::cin, title);
+    std::getline(std::cin >> std::ws, title);
+
     std::cout << "Enter Format (e.g., mp3, wav): ";
-    std::cin >> format;
-    duration = safeReadDouble("Enter Duration (seconds): ");
-    size = safeReadDouble("Enter Size (MB): ");
+    std::getline(std::cin >> std::ws, format);
+
+    double duration = safeReadDouble("Enter Duration (seconds): ");
+    double size = safeReadDouble("Enter Size (MB): ");
 
     if (typeChoice == 1) {
         std::string performer, genre;
         std::cout << "Enter Performer: ";
-        std::cin.ignore();
-        std::getline(std::cin, performer);
+        std::getline(std::cin >> std::ws, performer);
+
         std::cout << "Enter Genre: ";
-        std::getline(std::cin, genre);
+        std::getline(std::cin >> std::ws, genre);
 
         SongTrack song(id, title, format, duration, size, performer, genre);
         allSongs.push_back(song);
         std::cout << "Song added successfully!\n";
-
     }
     else if (typeChoice == 2) {
         std::string host, language;
         std::cout << "Enter Podcast Host: ";
-        std::cin.ignore();
-        std::getline(std::cin, host);
+        std::getline(std::cin >> std::ws, host);
+
         std::cout << "Enter Language: ";
-        std::getline(std::cin, language);
+        std::getline(std::cin >> std::ws, language);
 
         PodcastTrack podcast(id, title, format, duration, size, host, language);
         allPodcasts.push_back(podcast);
         std::cout << "Podcast added successfully!\n";
-
     }
     else if (typeChoice == 3) {
-        int year, month, day, priority;
-        year = safeReadInt("Enter Year: ");
-        month = safeReadInt("Enter Month (1-12): ");
-        day = safeReadInt("Enter Day: ");
-        priority = safeReadInt("Enter Priority (1-5): ");
+        int year = safeReadInt("Enter Year: ");
+        int month = safeReadInt("Enter Month (1-12): ");
+        int day = safeReadInt("Enter Day: ");
+        int priority = safeReadInt("Enter Priority (1-5): ");
 
         Date date(year, month, day);
         VoiceMemoTrack memo(id, title, format, duration, size, date, priority);
         allVoiceMemos.push_back(memo);
         std::cout << "Voice Memo added successfully!\n";
-    }
-    else {
-        std::cout << "Invalid track type selected!\n";
     }
 }
 
@@ -241,7 +239,6 @@ void AudioSystemManager::handlePlaylistManagement() {
     if (plChoice == 1) {
         std::string plName;
         std::cout << "Enter playlist name: ";
-        std::cin.ignore();
         std::getline(std::cin, plName);
 
         Playlist newPlaylist(plName);
@@ -554,8 +551,8 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
                         throw InvalidFileFormatException(filename);
                     }
 
-                    if (!trackId.empty() && trackId.back() == ',') {
-                        trackId.pop_back();
+                    if (inFile >> std::ws && inFile.peek() == ',') {
+                        inFile.get();
                     }
 
                     bool foundAndAdded = false;
@@ -607,6 +604,12 @@ void AudioSystemManager::loadFromFile(const std::string& filename) {
     std::cout << "Data loaded successfully from " << filename << "!\n";
 }
 
+void AudioSystemManager::removeTrackFromAllPlaylists(const std::string& trackId) {
+    for (size_t i = 0; i < playlists.getSize(); ++i) {
+        playlists[i].removeTrackById(trackId);
+    }
+}
+
 void AudioSystemManager::handleDeleteMenu() {
     int deleteChoice = 0;
     std::cout << "\n--- Delete Menu ---\n";
@@ -643,6 +646,8 @@ void AudioSystemManager::handleDeleteTrack() {
         }
         size_t idx = safeReadInt("Select index: ");
         if (idx >= 1 && idx <= allSongs.getSize()) {
+            std::string deletedId = allSongs[idx - 1].getId();
+            removeTrackFromAllPlaylists(deletedId);
             allSongs.remove(idx - 1);
             std::cout << "Song deleted successfully!\n";
         }
@@ -661,6 +666,8 @@ void AudioSystemManager::handleDeleteTrack() {
         }
         size_t idx = safeReadInt("Select index: ");
         if (idx >= 1 && idx <= allPodcasts.getSize()) {
+            std::string deletedId = allPodcasts[idx - 1].getId();
+            removeTrackFromAllPlaylists(deletedId);
             allPodcasts.remove(idx - 1);
             std::cout << "Podcast deleted successfully!\n";
         }
@@ -679,6 +686,8 @@ void AudioSystemManager::handleDeleteTrack() {
         }
         size_t idx = safeReadInt("Select index: ");
         if (idx >= 1 && idx <= allVoiceMemos.getSize()) {
+            std::string deletedId = allVoiceMemos[idx - 1].getId();
+            removeTrackFromAllPlaylists(deletedId);
             allVoiceMemos.remove(idx - 1);
             std::cout << "Voice memo deleted successfully!\n";
         }
@@ -701,8 +710,8 @@ void AudioSystemManager::handleDeletePlaylist() {
     for (size_t i = 0; i < playlists.getSize(); ++i) {
         std::cout << i + 1 << ". " << playlists[i].getPlaylistName() << "\n";
     }
-    size_t plIdx;
-    plIdx = safeReadInt("Select playlist index to delete: ");
+
+    size_t plIdx = safeReadInt("Select playlist index to delete: ");
 
     if (plIdx < 1 || plIdx > playlists.getSize()) {
         std::cout << "Invalid playlist index!\n";
@@ -712,8 +721,12 @@ void AudioSystemManager::handleDeletePlaylist() {
     std::cout << "What do you want to do with the tracks inside this playlist?\n";
     std::cout << "1. Keep them in the system (unassigned)\n";
     std::cout << "2. Delete them from the system entirely\n";
-    int actionChoice;
-    actionChoice = safeReadInt("Enter choice: ");
+    int actionChoice = safeReadInt("Enter choice: ");
+
+    if (actionChoice != 1 && actionChoice != 2) {
+        std::cout << "Invalid choice! Playlist deletion cancelled.\n";
+        return;
+    }
 
     if (actionChoice == 2) {
         Playlist& plToDelete = playlists[plIdx - 1];
@@ -745,6 +758,12 @@ void AudioSystemManager::handleDeletePlaylist() {
                             allVoiceMemos.remove(m);
                             break;
                         }
+                    }
+                }
+
+                for (size_t pIdx = 0; pIdx < playlists.getSize(); ++pIdx) {
+                    if (pIdx != plIdx - 1) {
+                        playlists[pIdx].removeTrackById(targetId);
                     }
                 }
             }
@@ -791,6 +810,9 @@ void AudioSystemManager::handleConcatenation() {
                 castedSong->printInfo();
             }
         }
+    }
+    else {
+        std::cout << "Invalid song index(es) selected!\n";
     }
 }
 
@@ -1012,7 +1034,6 @@ void AudioSystemManager::handleTextSearch() const {
 
     std::string keyword;
     std::cout << "Enter keyword or phrase to search for in subtitles: ";
-    std::cin.ignore();
     std::getline(std::cin, keyword);
 
     if (keyword.empty()) {
