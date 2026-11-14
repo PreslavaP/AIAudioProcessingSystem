@@ -1,45 +1,44 @@
-SONGS_COUNT 7
-S01 Bohemian_Rhapsody mp3 354 12.5 Queen Rock
+SONGS_COUNT 6
+"S01" "Bohemian Rhapsody" "mp3" 354.5 12.5 "Queen" "Rock"
 1
-0 0 55 0 0 1 45 0
-Mama, just killed a man. Put a gun against his head, pulled my trigger, now he's dead. Mama, life had just begun. But now I've gone and thrown it all away. Mama, ooh, didn't mean to make you cry If I'm not back again this time tomorrow. Carry on, carry on as if nothing really matters.
-S02 Nothing_Else_Matters mp3 387 11.2 Metallica Metal
+0 1 15 500 0 1 20 0
+Mama, just killed a man
+"S02" "Hotel California" "wav" 390 38.2 "Eagles" "Rock"
+0
+"S03" "Stairway to Heaven" "mp3" 482.1 15.6 "Led Zeppelin" "Rock"
+2
+0 0 10 0 0 0 30 0
+Introductory acoustic guitar melody
+0 2 15 0 0 2 45 0
+Guitar solo climax
+"S04" "Billie Jean" "mp3" 294 10 "Michael Jackson" "Pop"
+0
+"S05" "Smells Like Teen Spirit" "wav" 301 25.5 "Nirvana" "Grunge"
 1
-0 0 5 0 0 0 12 500
-Amazing guitar solo part
-S03 Billie_Jean flac 294 14.5 Michael_Jackson Pop
+0 1 0 0 0 1 20 0
+Loud chorus part
+"S03_S05" "Stairway to Heaven_Smells Like Teen Spirit" "mp3" 783.1 41.1 "Various" "Mixed"
 0
-S04 Shape_of_Ed mp3 233 8.4 Ed_Sheeran Pop
-0
-S05 Enter_Sandman flac 331 15.6 Metallica Metal
-0
-S06 Blinding_Lights mp3 200 7.5 The_Weekend Synthwave
-0
-S07 Nothing_Else_Matters_Billie_Jean mp3 681 25.7 Various Mixed
-0
-PODCASTS_COUNT 5
-P01 Cpp_Architecture wav 1800 45 TechTalk English
+PODCASTS_COUNT 3
+"P01" "Tech Talk Episode 1" "mp3" 1800 45 "John Smith" "English"
 1
-0 1 30 0 0 2 15 0
-Discussion about C++ architecture
-P02 Clean_Code mp3 1200 30 UncleBob English
+0 5 0 0 0 10 0 0
+Discussion about artificial intelligence and future technology
+"P02" "History of Science" "wav" 2700 90.5 "Michael Jordan" "English"
 0
-P03 Modern_History wav 2400 65 Prof_History Romanian
-0
-P04 Space_Exploration mp3 1500 42 NASA_Audio German
-0
-P05 Science_Today wav 1800 50 LabTalk Bulgarian
-0
+"P03" "Science Weekly" "mp3" 1500 35 "Dr. Sarah Connor" "English"
+1
+0 2 30 0 0 5 0 0
+Quantum computing introduction and basics
 VOICEMEMOS_COUNT 3
-V01 Project_Idea m4a 45 1.2 2026-10-16 5
+"M01" "OOP Project Ideas" "mp3" 45.2 1.2 2026-11-14 3
+0
+"M02" "Shopping List" "wav" 25 0.8 2026-11-15 1
 1
-0 0 10 0 0 0 25 0
-Important project deadline notes
-V02 Shopping_List m4a 30 0.8 2026-10-15 3
+0 0 2 0 0 0 10 0
+Milk, bread, eggs, and fresh fruit
+"M03" "Meeting Reminder" "mp3" 15.5 0.5 2026-11-16 5
 0
-V03 Ideas_for_App m4a 60 1.5 2026-9-29 2
-0
-PLAYLISTS_COUNT 3
-My_Favourites 2 S01, S06
-Pop_Hits 2 S03, S04
-Metal_Collection 2 S02, S05
+PLAYLISTS_COUNT 2
+"Favorite Songs" 2 "S04", "S03_S05"
+"Rock Hits" 3 "S01", "S02", "S03"
