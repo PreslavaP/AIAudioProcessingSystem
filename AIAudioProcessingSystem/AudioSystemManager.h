@@ -16,6 +16,7 @@ private:
 
 public:
     AudioSystemManager();
+    AudioSystemManager(const std::string& filename);
     ~AudioSystemManager();
 
     void run();
@@ -24,6 +25,7 @@ private:
     void showMenu() const;
     void handleChoice(int choice);
 
+    bool isIdUnique(const std::string& id) const;
     void handleAddTrack();
     void handleShowAllTracks() const;
     void handlePlaylistManagement();

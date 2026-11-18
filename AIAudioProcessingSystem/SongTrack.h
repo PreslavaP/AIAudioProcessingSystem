@@ -10,7 +10,7 @@ private:
 
 public:
 	SongTrack();
-	SongTrack(std::string id, std::string title, std::string format, double duration, double size, 
+	SongTrack(std::string id, std::string title, std::string format, double duration, double size,
 		std::string performer, std::string genre);
 
 	std::string getPerformer() const;

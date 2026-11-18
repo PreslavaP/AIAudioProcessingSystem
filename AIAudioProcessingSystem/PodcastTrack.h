@@ -10,7 +10,7 @@ private:
 
 public:
 	PodcastTrack();
-	PodcastTrack(std::string id, std::string title, std::string format, double duration, double size,
+	PodcastTrack(std::string id, std::string title, std::string format, double duration, double size, 
 		std::string podcastHost, std::string podcastLanguage);
 
 	std::string getPodcastHost() const;

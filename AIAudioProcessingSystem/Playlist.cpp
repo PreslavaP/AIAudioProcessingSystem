@@ -37,9 +37,18 @@ Playlist& Playlist::operator=(const Playlist& other) {
 }
 
 void Playlist::addTrack(std::unique_ptr<AudioTrack> track) {
-	if (track) {
-		tracks.push_back(std::move(track));
+	if (!track) {
+		return;
 	}
+
+	for (const auto& existingTrack : tracks) {
+		if (existingTrack && existingTrack->getId() == track->getId()) {
+			std::cout << "This song is already in the playlist!\n";
+			return;
+		}
+	}
+
+	tracks.push_back(std::move(track));
 }
 
 void Playlist::removeTrack(size_t index) {

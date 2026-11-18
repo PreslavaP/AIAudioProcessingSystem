@@ -13,6 +13,9 @@ protected:
     double duration;
     double size;
 
+private:
+    AudioContainer<AudioSegment> segments;
+
 public:
     //Конструктори
     AudioTrack();
@@ -37,8 +40,15 @@ public:
 
     std::unique_ptr<AudioTrack> operator+(const AudioTrack& other) const;
 
-    AudioContainer<AudioSegment> segments;
     void addSegment(const AudioSegment& segment);
+
+    AudioContainer<AudioSegment>& getSegments() {
+        return segments;
+    }
+
+    const AudioContainer<AudioSegment>& getSegments() const {
+        return segments;
+    }
 
     virtual void analyze() = 0;
     virtual void printInfo() const = 0;

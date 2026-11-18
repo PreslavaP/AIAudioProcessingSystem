@@ -3,7 +3,7 @@
 #include <iostream>
 
 SongTrack::SongTrack() : AudioTrack(), performer("UNKNOWN"), genre("No Genre") {}
-SongTrack::SongTrack(std::string id, std::string title, std::string format, double duration, double size, 
+SongTrack::SongTrack(std::string id, std::string title, std::string format, double duration, double size,
 	std::string performer, std::string genre) 
 	: AudioTrack(id, title, format, duration, size) {
 	setPerformer(performer);

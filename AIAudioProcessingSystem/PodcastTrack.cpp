@@ -4,7 +4,7 @@
 #include <iostream>
 
 PodcastTrack::PodcastTrack() : AudioTrack(), podcastHost("UNKNOWN"), podcastLanguage("No Language") {}
-PodcastTrack::PodcastTrack(std::string id, std::string title, std::string format, double duration, double size,
+PodcastTrack::PodcastTrack(std::string id, std::string title, std::string format, double duration, double size, 
 	std::string host, std::string language)
 	: AudioTrack(id, title, format, duration, size) {
 	setPodcastHost(host);
